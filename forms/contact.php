@@ -1,41 +1,38 @@
 <?php
-  /**
-  * Requires the "PHP Email Form" library
-  * The "PHP Email Form" library is available only in the pro version of the template
-  * The library should be uploaded to: vendor/php-email-form/php-email-form.php
-  * For more info and help: https://bootstrapmade.com/php-email-form/
-  */
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
-  // Replace contact@example.com with your real receiving email address
-  $receiving_email_address = 'contact@example.com';
+require '../Mailer/src/Exception.php';
+require '../Mailer/src/PHPMailer.php';
+require '../Mailer/src/SMTP.php';
 
-  if( file_exists($php_email_form = '../assets/vendor/php-email-form/php-email-form.php' )) {
-    include( $php_email_form );
-  } else {
-    die( 'Unable to load the "PHP Email Form" Library!');
+
+   $name = $_POST['name'];
+   $correo = $_POST['email'];
+   $asunto = $_POST['subject'];
+   $message = $_POST['message'];
+
+//$mail = new PHPMailer(true);
+$mail = new PHPMailer;//Create a new PHPMailer instance
+$mail->isSMTP();//Tell PHPMailer to use SMTP
+//$mail->SMTPDebug = 2;
+$mail->Host = 'smtp.gmail.com';
+$mail->Port = 587;
+$mail->SMTPSecure = 'tsl';
+$mail->IsHTML(true);
+$mail->SMTPAuth = true;
+$mail->Username = 'jarp.8606@gmail.com';
+$mail->Password = 'fizfpluhiswovznm';
+$mail->setFrom($correo, $name);
+$mail->addAddress($correo, $name);
+$mail->addAddress('jarp.8606@gmail.com', $name);
+$mail->Subject = $asunto;
+$mail->Body = $message;
+$mail->AltBody = 'This is a plain-text message body';
+
+if (!$mail->send()) {
+    echo "Mailer Error: " . $mail->ErrorInfo;
+} else {
+    echo "Message sent!";
   }
-
-  $contact = new PHP_Email_Form;
-  $contact->ajax = true;
-  
-  $contact->to = $receiving_email_address;
-  $contact->from_name = $_POST['name'];
-  $contact->from_email = $_POST['email'];
-  $contact->subject = $_POST['subject'];
-
-  // Uncomment below code if you want to use SMTP to send emails. You need to enter your correct SMTP credentials
-  /*
-  $contact->smtp = array(
-    'host' => 'example.com',
-    'username' => 'example',
-    'password' => 'pass',
-    'port' => '587'
-  );
-  */
-
-  $contact->add_message( $_POST['name'], 'From');
-  $contact->add_message( $_POST['email'], 'Email');
-  $contact->add_message( $_POST['message'], 'Message', 10);
-
-  echo $contact->send();
 ?>
